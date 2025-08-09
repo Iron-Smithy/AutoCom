@@ -8,7 +8,7 @@ from groupme_bot import send_groupme_message
 SHEET_ID = os.environ.get("GOOGLE_SHEET_ID")  # From GitHub Secrets
 DEFAULT_TAB = "sheet1"
 SUNDAY_TAB = "sheet2"
-LOCAL_TZ = pytz.timezone("America/New_York")  # <-- Change this to your timezone
+LOCAL_TZ = pytz.timezone("America/Chicago")  # <-- Change this to your timezone
 
 # --- DATE HANDLING ---
 def handle_date():
@@ -23,6 +23,8 @@ def handle_date():
         today += timedelta(days=1)
     elif weekday == 5:  # Saturday → use Sunday tab
         today += timedelta(days=1)
+        tab_gid = SUNDAY_TAB
+    elif weekday == 6:  # use Sunday tab
         tab_gid = SUNDAY_TAB
     elif weekday != 2:  # Not Wednesday → skip
         print("Did not match special days:", today)
