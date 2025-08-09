@@ -1,19 +1,23 @@
 import os
-from sheets import fetch_sheet_csv as fetch_sheet
+import pytz
 from datetime import datetime, timedelta
+from sheets import fetch_sheet_csv as fetch_sheet
 from groupme_bot import send_groupme_message
 
 # --- CONFIGURATION ---
 SHEET_ID = os.environ.get("GOOGLE_SHEET_ID")  # From GitHub Secrets
 DEFAULT_TAB = "sheet1"
 SUNDAY_TAB = "sheet2"
+LOCAL_TZ = pytz.timezone("America/New_York")  # <-- Change this to your timezone
 
 # --- DATE HANDLING ---
 def handle_date():
-    """Determine the correct date and Google Sheet tab based on today's weekday."""
-    today = datetime.now().date()
+    """Determine the correct date and Google Sheet tab based on local weekday."""
+    today = datetime.now(LOCAL_TZ).date()
     tab_gid = DEFAULT_TAB
-    weekday = today.weekday()
+    weekday = today.weekday()  # Monday=0 ... Sunday=6
+
+    print(f"[DEBUG] Local date: {today}, weekday: {weekday}")
 
     if weekday == 1:  # Tuesday → use Wednesday
         today += timedelta(days=1)
