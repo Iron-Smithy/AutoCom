@@ -1,0 +1,29 @@
+name: Scheduled GroupMe Message
+
+on:
+  schedule:
+    - cron: '0 1 * * 2,3,6'  # Tue, Wed, Sat at 01:00 UTC
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run the script
+      env:
+        GROUPME_BOT_ID: ${{ secrets.GROUPME_BOT_ID }}
+        GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+      run: python main.py
