@@ -2,7 +2,7 @@ name: Scheduled GroupMe Message
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # Tue, Wed, Sat at 01:00 UTC
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
