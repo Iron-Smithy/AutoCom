@@ -70,7 +70,9 @@ def make_human_readable(date_str, data, tab):
         if activity == "[Empty]":
             return f"No marked activity {matching_row[0]}"
 
-        return f"The Wednesday activity for {matching_row[0]} is {activity}{". No marked location" if where == "IDK" else f" at {where}"}{extra_text}"
+        location_text = ". No marked location" if where == "IDK" else f" at {where}"
+        return f"The Wednesday activity for {matching_row[0]} is {activity}{location_text}{extra_text}"
+
     else:
         if matching_row[1] == "Null":
             return f"{matching_row[0]} is {matching_row[2]}"
