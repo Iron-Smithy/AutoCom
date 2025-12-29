@@ -4,7 +4,7 @@
 
 ---
 
-## 1. What This Program Does (High-Level)
+## 1. What This Program Does
 
 This program automatically:
 
