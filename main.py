@@ -51,6 +51,15 @@ def handle_date(now=None):
     print(f"[DEBUG] Target date: {target_date}, tab: {tab_gid}")
     return target_date.strftime("%Y-%m-%d"), tab_gid
 
+# --- HELPERS ---
+def is_empty(value):
+    return value is None or value.strip() == "" or value.strip().lower() in {"null", "[null]", "none", "[none]", "empty", "[empty]"} 
+
+def safe_get(row, index, default=""):
+    try:
+        return row[index].strip()
+    except (IndexError, AttributeError):
+        return default
 
 # --- MESSAGE FORMATTING ---
 def make_human_readable(date_str, data, tab):
@@ -60,38 +69,60 @@ def make_human_readable(date_str, data, tab):
         return f"No data found for {date_str}"
 
     if tab == DEFAULT_TAB:
-        activity = matching_row[1]
-        where = matching_row[2]
-        extra_data = matching_row[3]
-        extra_text = "" if extra_data == "" else f", bring {extra_data}"
+        activity = safe_get(matching_row, 1)
+        where = safe_get(matching_row, 2)
+        extra = safe_get(matching_row, 3)
 
-        if activity == "[None]":
-            return f"No activity {matching_row[0]}"
-        if activity == "[Empty]":
-            return f"No marked activity {matching_row[0]}"
+        if activity.strip().lower() == "!unmarked":
+            return f"{matching_row[0]} has no marked activity"
 
-        location_text = ". No marked location" if where == "IDK" else f" at {where}"
-        return f"The Wednesday activity for {matching_row[0]} is {activity}{location_text}{extra_text}"
+        if is_empty(activity):
+            return f"No Wednesday activity is scheduled for {matching_row[0]}."
 
-    else:
-        if matching_row[1] == "Null":
-            return f"{matching_row[0]} is {matching_row[2]}"
+        message = f"The Wednesday activity for {matching_row[0]} is {activity}"
+
+        if is_empty(where):
+            pass
+            # dont mention it
+        elif where.upper() == "IDK":
+            message += ". Location is unknown"
         else:
-            if matching_row[3] == "Null":
-                return (
-                    f"Responsibilities for the Sunday of {matching_row[0]}:\n"
-                    f"  {matching_row[1]} has Bread\n"
-                    f"  {matching_row[2]} have Sacrament Prep\n"
-                    f"  Today is {matching_row[4]}"
-                )
+            message += f" at {where}"
+
+        if not is_empty(extra):
+            message += f". Bring {extra}"
+
+        return message
+    else:  # Sunday
+        custom_message = safe_get(matching_row, 1)
+
+        if not is_empty(custom_message):
+            return f"{matching_row[0]}: {custom_message}"
+
+        bread = safe_get(matching_row, 2)
+        sacrament = safe_get(matching_row, 3)
+        lesson = safe_get(matching_row, 4)
+        fsy = safe_get(matching_row, 5)
+
+        lines = [f"Responsibilities for Sunday {matching_row[0]}:"]
+
+        if not is_empty(bread):
+            lines.append(f"  {bread} has Bread")
+        if not is_empty(sacrament):
+            lines.append(f"  {sacrament} has Sacrament Prep")
+        if not is_empty(lesson):
+            if lesson.lower() == '5th sunday':
+                lines.append(f"  today is 5th sunday")
             else:
-                return (
-                    f"Responsibilities for the Sunday of {matching_row[0]}:\n"
-                    f"  {matching_row[1]} has Bread\n"
-                    f"  {matching_row[2]} have Sacrament Prep\n"
-                    f"  {matching_row[3]} has Lesson\n"
-                    f"  {matching_row[4]} has the FSY lesson"
-                )
+                lines.append(f"  {lesson} has Lesson")
+        if not is_empty(fsy):
+            lines.append(f"  {fsy} has the FSY lesson")
+
+        if len(lines) == 1:
+            lines.append("  No responsibilities have been assigned yet.")
+
+        return "\n".join(lines)
+
 
 # --- MAIN PROGRAM ---
 def main():
