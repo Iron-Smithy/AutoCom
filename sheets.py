@@ -5,7 +5,6 @@ from io import StringIO
 # Map logical tab names to GID numbers
 SHEET_GIDS = {
     'sheet1': '0',
-    'sheet2': '779562486'
 }
 
 def fetch_sheet_csv(sheet_id, tab):
