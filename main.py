@@ -82,10 +82,11 @@ def main():
                         continue
 
     print("\n".join(msg))
-    try:
-        send_groupme_message("\n".join(msg))
-    except Exception as e:
-        print(f"[ERROR] Failed to send GroupMe message: {e}")
+    if (msg):
+        try:
+            send_groupme_message("\n".join(msg))
+        except Exception as e:
+            print(f"[ERROR] Failed to send GroupMe message: {e}")
 
 if __name__ == "__main__":
     main()
